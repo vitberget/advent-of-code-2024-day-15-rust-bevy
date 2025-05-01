@@ -22,7 +22,7 @@ impl PuzzleSolvingTicker {
     pub fn update_duration(&mut self) {
         self.timer.set_duration(Duration::from_millis(self.duration));
     }
-    
+
     pub fn new(time: u64) -> Self {
         PuzzleSolvingTicker { 
             timer: Timer::new(Duration::from_millis(time), TimerMode::Repeating),
@@ -79,9 +79,12 @@ pub fn escape_the_matrix(
         }
         warehouse.movements.clear();
 
-        let (_, mut transform) = player_query.single_mut();
-        *transform = player_transform(&warehouse.player ,&warehouse);
-        light_query.single_mut().color = Color::srgb(1.0, 1.0, 1.0);
+        if let Ok((_, mut transform)) = player_query.single_mut() {
+            *transform = player_transform(&warehouse.player ,&warehouse);
+        }
+        if let Ok(mut light) = light_query.single_mut() {
+            light.color = Color::srgb(1.0, 1.0, 1.0);
+        }
 
         objects_query.iter_mut()
             .for_each(|(object, mut transform)| if let Some(pos) = warehouse.objects.get(&object.index) {
@@ -115,19 +118,20 @@ pub fn step_trigger(
             let step = warehouse.movements.remove(0);
             let (player, moved_objects) = take_step(&warehouse.player, &step, &warehouse.objects, &warehouse.walls);
 
-            let (player_entity, _, p_transform) = player_query.single();
-            let pos = warehouse.player + step.delta_position();
+            if let Ok((player_entity, _, p_transform)) = player_query.single() {
 
-            if let Some(player) = player {
-                warehouse.player = player;
-            } else {
-                let (color_entity, mut light) = light_query.single_mut();
-                light.color = Color::srgb(1.0, 0.0, 0.0);
-                commands.entity(color_entity).insert( TurnOffTheLight::new((anim/2) as u64));
+                let pos = warehouse.player + step.delta_position();
+
+                if let Some(player) = player {
+                    warehouse.player = player;
+                } else if let Ok((color_entity, mut light)) = light_query.single_mut() {
+                    light.color = Color::srgb(1.0, 0.0, 0.0);
+                    commands.entity(color_entity).insert( TurnOffTheLight::new((anim/2) as u64));
+                }
+
+                commands.entity(player_entity).insert(SmoothObject::new(*p_transform, player_transform(&pos, &warehouse), anim as u64, player.is_some()));
+
             }
-
-            commands.entity(player_entity).insert(SmoothObject::new(*p_transform, player_transform(&pos, &warehouse), anim as u64, player.is_some()));
-
             if let Some(objects) = moved_objects {
                 for (idx, pos) in objects {
                     warehouse.objects.insert(idx, pos);
