@@ -52,8 +52,8 @@ pub fn shrinking(
     let delta = time.delta();
    for (entity, mut transform, mut shrinker) in shrink_query.iter_mut() {
         shrinker.timer.tick(delta);
-        if shrinker.timer.finished() {
-            commands.entity(entity).despawn_recursive();
+        if shrinker.timer.is_finished() {
+            commands.entity(entity).despawn();
         } else {
             let scale: f32 = shrinker.timer.elapsed().as_millis() as f32 / shrinker.timer.duration().as_millis() as f32;
             transform.scale = Vec3::new(1.0 - scale, 1.0 - scale, 1.0 - scale);
@@ -75,7 +75,7 @@ pub fn score_trigger(
 ) {
     puzzle_ticker.timer.tick(time.delta());
 
-    if puzzle_ticker.timer.finished() && !warehouse.objects.is_empty() {
+    if puzzle_ticker.timer.is_finished() && !warehouse.objects.is_empty() {
         let anim = puzzle_ticker.timer.duration().as_millis();
         if anim > 4 { puzzle_ticker.timer.set_duration(Duration::from_millis(anim as u64 - 1)); }
 

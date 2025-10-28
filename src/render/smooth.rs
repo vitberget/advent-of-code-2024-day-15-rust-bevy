@@ -50,7 +50,7 @@ pub fn smooth_objects(
             let elapsed = smooth.timer.elapsed().as_millis();
             let duration = smooth.timer.duration().as_millis();
 
-            if smooth.timer.finished() || duration < 10 || !smooth.good && elapsed > duration / 2 {
+            if smooth.timer.is_finished() || duration < 10 || !smooth.good && elapsed > duration / 2 {
                 *transform = if smooth.good { smooth.to } else { smooth.from };
                 commands.entity(entity).remove::<SmoothObject>();
             } else {
@@ -76,7 +76,7 @@ pub fn turn_off_the_light(
     if !next_puzzle_state.is_added() {
         for (entity, mut light, mut turn_off_timer) in &mut light_query {
             turn_off_timer.timer.tick(time.delta());
-            if turn_off_timer.timer.finished() {
+            if turn_off_timer.timer.is_finished() {
                 commands.entity(entity).remove::<TurnOffTheLight>();
                 light.color = Color::srgb(1.0, 1.0, 1.0);
             }

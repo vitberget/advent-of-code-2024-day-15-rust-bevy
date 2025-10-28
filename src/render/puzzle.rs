@@ -106,7 +106,7 @@ pub fn step_trigger(
 ) {
     puzzle_ticker.timer.tick(time.delta());
 
-    if puzzle_ticker.timer.finished() {
+    if puzzle_ticker.timer.is_finished() {
         if warehouse.movements.is_empty() {
             next_puzzle_state.set(PuzzleState::Scoring);
         } else if !next_puzzle_state.is_added() {
