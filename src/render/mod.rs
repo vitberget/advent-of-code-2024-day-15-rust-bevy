@@ -12,7 +12,7 @@ pub mod walls;
 pub fn setup_camera_and_light( mut commands: Commands,) {
     commands.spawn((
         PointLight {
-            shadows_enabled: true,
+            shadow_maps_enabled: true,
             range: 1060.0,
             radius: 30.0,
             intensity: 50_000_000.0,

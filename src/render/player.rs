@@ -35,7 +35,7 @@ pub fn add_player(
             ));
             parent.spawn((
                     PointLight {
-                        shadows_enabled: true,
+                        shadow_maps_enabled: true,
                         range: 7.0,
                         // radius: 30.0,
                         intensity: 500_000.0,

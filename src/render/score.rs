@@ -35,7 +35,7 @@ pub fn setup_score(
     commands.spawn((
             Text::new(""),
             TextFont {
-                font_size: 42.0,
+                font_size: FontSize::Px(42.0),
                 ..default()
             },
             ScoreText
